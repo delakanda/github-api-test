@@ -1,14 +1,15 @@
 import { gql } from '@apollo/client';
 
-export const getFetchUserQuery = (username: string) => {
+export const getFetchUserQuery = () => {
     return gql`
-        query { 
-            user(login:"${username}") {
-                name,
-                avatarUrl,
-                bio,
-                email
+        query 
+            user($username: String!) {
+                user(login: $username) {
+                    name,
+                    avatarUrl,
+                    bio,
+                    email
+                }
             }
-        }
     `;
 }

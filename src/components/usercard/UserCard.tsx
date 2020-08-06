@@ -14,7 +14,7 @@ function UserCard(props: TProps) {
         <AppContext.Consumer>
             {context => context && (
                 <Link to={"/details"} onClick={() => context.setUserDetails(props.user)}>
-                    <div className="card">
+                    <div className="card" data-testid="user-card">
                         <div className="image">
                             {props.user.avatarUrl ?
                                 <img src={props.user.avatarUrl} />

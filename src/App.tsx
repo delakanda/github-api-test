@@ -8,6 +8,7 @@ import { AppContext } from './utils/ContextApi';
 import { BrowserRouter, Route } from 'react-router-dom';
 import UserList from './components/userlist/UserList';
 import UserDetails from './components/userdetails/UserDetails';
+import { useLazyQuery } from '@apollo/client';
 
 function App() {
 
@@ -17,34 +18,38 @@ function App() {
   const [searchInput, setSearchInput] = useState<string>("");
   const [fetchState, setFetchState] = useState<string>(Constants.FETCH_STATE_STATE_NEUTRAL);
 
-  const fetchUser = () => {
-    if(searchInput) {
-      setFetchState(Constants.FETCH_STATE_FETCHING);
-      setError(null);
-
-      fetchUsers(getFetchUserQuery(searchInput)).then((data: TGraphqlUser) => {
-        setFetchState(Constants.FETCH_STATE_FETCHED);
-
-        if(data.user) {
-          let _users = [...users];
-          const userExists = _users.find((element: TUser) => {
-            return element.name === data.user.name
-          });
-          if(!userExists) {
-            _users.unshift(data.user);
-            setUsers(_users);
-            
-          }
-        } else {
-          setError(`User could not be found with login name: ${searchInput}`);
+  const [getUser, { called, loading, data }] = useLazyQuery(getFetchUserQuery(), {
+    onCompleted: data => {
+      if(data.user) {
+        let _users = [...users];
+        const userExists = _users.find((element: TUser) => {
+          return element.name === data.user.name
+        });
+        if(!userExists) {
+          _users.unshift(data.user);
+          setUsers(_users);
         }
-
-        setSearchInput("");
-      }).catch((err) => {
-        setError("An error occurred, please try again");
-        setFetchState(Constants.FETCH_STATE_FETCH_ERROR);
-      });
+      }
+    },
+    onError: err => {
+      console.log(err)
+      setError(`User could not be found with login name: ${searchInput}`);
+      setFetchState(Constants.FETCH_STATE_FETCH_ERROR);
     }
+  });
+
+  useEffect(() => {
+    if(loading) {
+      setFetchState(Constants.FETCH_STATE_FETCHING);
+    } else {
+      setFetchState(Constants.FETCH_STATE_FETCHED);
+    }
+  }, [loading])
+
+  const fetchUser = () => {
+    setFetchState(Constants.FETCH_STATE_FETCHING);
+    setError(null);
+    getUser({ variables: { username: searchInput } });
   };
   
   return (
