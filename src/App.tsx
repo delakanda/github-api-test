@@ -12,6 +12,7 @@ import UserDetails from './components/userdetails/UserDetails';
 function App() {
 
   const [users, setUsers] = useState<TUser[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [userDetails, setUserDetails] = useState<TUser | null>(null);
   const [searchInput, setSearchInput] = useState<string>("");
   const [fetchState, setFetchState] = useState<string>(Constants.FETCH_STATE_STATE_NEUTRAL);
@@ -19,20 +20,28 @@ function App() {
   const fetchUser = () => {
     if(searchInput) {
       setFetchState(Constants.FETCH_STATE_FETCHING);
-      // control useQuery fetch
+      setError(null);
+
       fetchUsers(getFetchUserQuery(searchInput)).then((data: TGraphqlUser) => {
         setFetchState(Constants.FETCH_STATE_FETCHED);
-        let _users = [...users];
-        const userExists = _users.find((element: TUser) => {
-          return element.name === data.user.name
-        });
-        if(!userExists) {
-          _users.unshift(data.user);
-          setUsers(_users);
-          setSearchInput("");
+
+        if(data.user) {
+          let _users = [...users];
+          const userExists = _users.find((element: TUser) => {
+            return element.name === data.user.name
+          });
+          if(!userExists) {
+            _users.unshift(data.user);
+            setUsers(_users);
+            
+          }
+        } else {
+          setError(`User could not be found with login name: ${searchInput}`);
         }
+
+        setSearchInput("");
       }).catch((err) => {
-        console.log(err);
+        setError("An error occurred, please try again");
         setFetchState(Constants.FETCH_STATE_FETCH_ERROR);
       });
     }
@@ -44,6 +53,7 @@ function App() {
       userDetails,
       searchInput,
       fetchState,
+      error,
       setSearchInput,
       fetchUser,
       setUserDetails
@@ -53,7 +63,6 @@ function App() {
           <Route exact path='/' component={UserList} />
           <Route path='/details' component={UserDetails} />
         </BrowserRouter>
-        
       </div>
     </AppContext.Provider>
   );

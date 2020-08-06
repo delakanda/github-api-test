@@ -6,6 +6,7 @@ export type TAppContext = {
     userDetails: TUser | null;
     searchInput: string;
     fetchState: string;
+    error: string | null;
     setSearchInput: Function;
     fetchUser: Function;
     setUserDetails: Function;

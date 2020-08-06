@@ -12,6 +12,10 @@ function SearchInput() {
                         placeholder="Enter username to search"
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => context.setSearchInput(e.target.value)} />
 
+                    <span className="error">{context.error}</span>
+
+                    <br/>
+
                     <button onClick={() => context.fetchUser()} className="search-btn">Search</button>
                 </div>
             )}
