@@ -1,25 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import SearchInput from './components/search/SearchInput';
+import { useLazyQuery, ApolloProvider, ApolloClient } from '@apollo/client';
+import { getFetchUserQuery } from './queries/User';
 
 function App() {
+
+  const [searchInput, setSsearchInput] = useState<string>("");
+  
+  // useEffect(() => {
+  //   console.log(searchInput)
+  // }, [searchInput])
+
+  const [getUser, { loading, error, data, refetch }] = useLazyQuery(getFetchUserQuery(searchInput));
+
+  console.log(data);
+
+  const fetchUser = () => {
+    console.log("FETCH");
+    getUser();
+  };
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ApolloProvider client={new ApolloClient({  })}>
+      <div className="App">
+        <SearchInput searchInput={searchInput} setSearchInput={setSsearchInput} fetchUser={fetchUser} />
+
+        {loading &&
+          <p>Loading...</p>
+        }
+
+        {error &&
+          <p>An Erro occured</p>
+        }
+        
+      </div>
+    </ApolloProvider>
   );
 }
 
