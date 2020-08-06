@@ -5,5 +5,5 @@ export const fetchUsers = (gqlQeury: DocumentNode) => {
     const apolloClient = getApolloClient();
     return apolloClient.query({ query: gqlQeury }).then((res) => {
         return res.data;
-    });
+    }).catch((err) => { return err });
 };

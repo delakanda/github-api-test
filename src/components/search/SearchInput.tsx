@@ -1,22 +1,21 @@
 import React from 'react';
 import './SearchInput.css';
+import { AppContext } from '../../utils/ContextApi';
 
-type TProps = {
-    searchInput: string;
-    setSearchInput: Function;
-    fetchUser: Function;
-};
-
-function SearchInput(props: TProps) {
+function SearchInput() {
     return (
-        <div className="search-input">
-            <input type="text" 
-                value={props.searchInput} 
-                placeholder="Enter username to search"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.setSearchInput(e.target.value)} />
+        <AppContext.Consumer>
+            {context => context && (
+                <div className="search-input">
+                    <input type="text" 
+                        value={context.searchInput} 
+                        placeholder="Enter username to search"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => context.setSearchInput(e.target.value)} />
 
-            <button onClick={() => props.fetchUser()} className="search-btn">Search</button>
-        </div>
+                    <button onClick={() => context.fetchUser()} className="search-btn">Search</button>
+                </div>
+            )}
+        </AppContext.Consumer>
     );
 }
 
