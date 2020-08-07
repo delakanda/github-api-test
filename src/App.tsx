@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { getFetchUserQuery } from './queries/User';
-import { TGraphqlUser, TUser } from './types/User';
-import { fetchUsers } from './apollo/Query';
+import { TUser } from './types/User';
 import * as Constants from './utils/Constants';
 import { AppContext } from './utils/ContextApi';
 import { BrowserRouter, Route } from 'react-router-dom';
@@ -18,16 +17,17 @@ function App() {
   const [searchInput, setSearchInput] = useState<string>("");
   const [fetchState, setFetchState] = useState<string>(Constants.FETCH_STATE_STATE_NEUTRAL);
 
-  const [getUser, { called, loading, data }] = useLazyQuery(getFetchUserQuery(), {
+  const [getUser, { loading }] = useLazyQuery(getFetchUserQuery(), {
     onCompleted: data => {
       if(data.user) {
         let _users = [...users];
-        const userExists = _users.find((element: TUser) => {
-          return element.name === data.user.name
-        });
+        const userExists = _users.find((element: TUser) => element.name === data.user.name );
         if(!userExists) {
           _users.unshift(data.user);
+          console.log(_users);
           setUsers(_users);
+          setSearchInput('');
+          setFetchState(Constants.FETCH_STATE_FETCHED);
         }
       }
     },
@@ -35,6 +35,7 @@ function App() {
       console.log(err)
       setError(`User could not be found with login name: ${searchInput}`);
       setFetchState(Constants.FETCH_STATE_FETCH_ERROR);
+      setSearchInput('');
     }
   });
 
@@ -51,6 +52,15 @@ function App() {
     setError(null);
     getUser({ variables: { username: searchInput } });
   };
+
+  const deleteUser = (username: string) => {
+    let _users = [...users];
+    const userIdx = _users.findIndex((element: TUser) => element.name === username );
+    if(userIdx != -1) {
+      _users.splice(userIdx, 1);
+      setUsers(_users);
+    }
+  };
   
   return (
     <AppContext.Provider value={{
@@ -61,7 +71,8 @@ function App() {
       error,
       setSearchInput,
       fetchUser,
-      setUserDetails
+      setUserDetails,
+      deleteUser
     }}>
       <div className="App">
         <BrowserRouter>

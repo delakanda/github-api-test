@@ -10,4 +10,5 @@ export type TAppContext = {
     setSearchInput: Function;
     fetchUser: Function;
     setUserDetails: Function;
+    deleteUser: Function;
 };

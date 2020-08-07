@@ -13,8 +13,11 @@ function UserCard(props: TProps) {
     return (
         <AppContext.Consumer>
             {context => context && (
-                <Link to={"/details"} onClick={() => context.setUserDetails(props.user)}>
-                    <div className="card" data-testid="user-card">
+                <div className="card" data-testid="user-card">
+                    {!props.showFullDetails &&
+                        <span className="close-btn" title="delete" onClick={() => context.deleteUser(props.user.name)}>x</span>
+                    }
+                    <Link to={"/details"} onClick={() => context.setUserDetails(props.user)}>
                         <div className="image">
                             {props.user.avatarUrl ?
                                 <img src={props.user.avatarUrl} />
@@ -33,8 +36,8 @@ function UserCard(props: TProps) {
                                 {props.user.bio || "No bio"}
                             </p>
                         }
-                    </div>
-                </Link>
+                    </Link>
+                </div>
             )}
         </AppContext.Consumer>
     );
